@@ -276,4 +276,95 @@
             }, scrollIntervalTime);
         }
 
-        fu
+        function stopAutoScroll() {
+            if (isAutoScrolling) {
+                clearInterval(autoScrollInterval);
+                isAutoScrolling = false;
+            }
+        }
+
+        ['wheel', 'touchstart', 'mousedown', 'keydown'].forEach(eventType => {
+            window.addEventListener(eventType, () => {
+                stopAutoScroll();
+            }, { passive: true });
+        });
+
+        btnOpen.addEventListener('click', function() {
+            coverSection.style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                coverSection.style.display = 'none';
+            }, 700);
+            
+            audio.play().catch(error => {
+                console.log("Autoplay blocked:", error);
+            });
+
+            musicBtn.classList.remove('hidden');
+            musicBtn.classList.add('flex');
+            
+            floatingMenu.classList.remove('hidden');
+            floatingMenu.classList.add('flex');
+            
+            document.body.classList.remove('overflow-y-hidden');
+            document.body.style.overflowY = 'auto';
+
+            setTimeout(() => {
+                startAutoScroll();
+            }, 800);
+        });
+
+        // 3. Music Toggle Logic
+        let isPlaying = true;
+        function toggleMusic() {
+            const musicIcon = document.getElementById('music-icon');
+            if (isPlaying) {
+                audio.pause();
+                musicIcon.classList.remove('animate-spin');
+                musicBtn.classList.add('opacity-50');
+            } else {
+                audio.play();
+                musicIcon.classList.add('animate-spin');
+                musicBtn.classList.remove('opacity-50');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // 4. RSVP Form Submission Simulation
+        function submitRsvp(e) {
+            e.preventDefault();
+            const name = document.getElementById('sender-name').value;
+5            const status = document.getElementById('rsvp-status').value;
+            const message = document.getElementById('sender-message').value;
+            
+            const container = document.getElementById('wishes-container');
+            const badgeClass = status === 'Hadir' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800';
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'bg-stone-50 border border-stone-200 p-3.5 rounded-xl text-xs animate-pulse';
+            newItem.innerHTML = `
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-stone-900">${escapeHtml(name)}</span>
+                    <span class="text-[10px] ${badgeClass} px-2 py-0.5 rounded-full font-medium">${status}</span>
+                </div>
+                <p class="text-stone-600">${escapeHtml(message)}</p>
+            `;
+            
+            container.prepend(newItem);
+            document.getElementById('sender-message').value = '';
+            alert('Terima kasih! Ucapan dan konfirmasi kehadiran Anda berhasil dikirim.');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
+
